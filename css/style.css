@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+  background-image: url("../Imagens/template.jpg");
+}
+
+
+.banner{
+	background-color: white;
+	padding: 20px;
+	margin: 0px;
+}
