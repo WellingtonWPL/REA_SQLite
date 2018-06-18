@@ -58,7 +58,7 @@
               <h1 class="brand-heading">REA - SQLite</h1>
               <p class="intro-text">Repositório Educacional Aberto sobre a implementação 
               						de processos e threads no SQLite</p>
-              <a href="#txt-fir" class="btn btn-circle js-scroll-trigger">
+              <a href="#txt-intro" class="btn btn-circle js-scroll-trigger">
                 <i class="fa fa-angle-double-down animated"></i>
               </a>
             </div>
@@ -67,6 +67,30 @@
       </div>
     </header>
 
+    <!-- White Section -->
+    <section id="txt-intro" class="white-section content-section text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <h2>Threading no SQLite</h2>
+            <p>O SQLite implementa 3 modos de Threading:</p>
+            
+            <ul>
+              <li><p>Single thread: Modo onde todos mutex estão desabilitados e o SQLite não executa de forma segura em mais de uma thread de cada vez.</p>
+              </li>
+              <li><p>Multi-thread: Modo onde o SQLite pode ser utilizado com várias threads. Contudo uma conexão com o banco de dados não deve ser feita em mais que uma thread.</p>
+              </li>
+              <li><p>Serialized: SQLite pode utilizar várias threads sem restrição. Esse modo é utilizado como default.</p>
+              </li>
+            </ul>
+      
+            <p>O modo de implementação de thread pode ser selecionado no momento da compilação (compile-time), quando o aplicativo que utiliza o SQLite inicializa (start-time) ou quando a uma nova conexão com o SQLite está sendo criada (run-time).</p>
+            <p>Nessa linha de pensamento o run-time pode sobrescrever o start-time que por sua vez pode sobrescrever o compile-time. Quando compilado com a opção single thread as opções anteriores não podem ser sobrescritas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  
     <!-- Blue Section -->
     <section id="txt-fir" class="content-section text-center">
       <div class="container">
