@@ -82,22 +82,11 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-8 mx-auto">
-            <h2>Threading no SQLite</h2>
-            <p>O SQLite implementa 3 modos de Threading:</p>
             
-            <ul>
-              <li><p>Single thread: Modo onde todos mutex estão desabilitados e o SQLite não executa de forma segura em mais de uma thread de cada vez.</p>
-              </li>
-              <li><p>Multi-thread: Modo onde o SQLite pode ser utilizado com várias threads. Contudo uma conexão com o banco de dados não deve ser feita em mais que uma thread.</p>
-              </li>
-              <li><p>Serialized: SQLite pode utilizar várias threads sem restrição. Esse modo é utilizado como default.</p>
-              </li>
-            </ul>
-      
-            <p>O modo de implementação de thread pode ser selecionado no momento da compilação (compile-time), quando o aplicativo que utiliza o SQLite inicializa (start-time) ou quando a uma nova conexão com o SQLite está sendo criada (run-time).</p>
-            <p>Nessa linha de pensamento o run-time pode sobrescrever o start-time que por sua vez pode sobrescrever o compile-time. Quando compilado com a opção single thread as opções anteriores não podem ser sobrescritas.</p>
-
-            
+            <img style="margin-bottom: 50px;" width="280px"  src="img/sqlite.svg" /> 
+            <p >O SQLite é uma biblioteca em linguagem C de código aberto que implementa um sistema de banco de dados SQL imbutido. Ao contrário de outros bancos de dados que ficam em servidores, cada banco de dados SQLite é armazenado em um único arquivo no disco. A biblioteca lê e escreve diretamente no arquivo de banco de dados no disco.</p>
+            <p>Por sua leveza e rapidez o SQLite é banco de dados interno oficial dos dispositivos Android sendo assim todo dispositivo possui o SQLite incorporado nativamente.</p>
+            <p>Este repositório contém informações sobre a implementação de Threads no SQLite, toda a informação aqui contida pode ser conferida no site oficial do <a href="https://www.sqlite.org/index.html">SQLite</a> assim como a documentação e o código fonte. No momento da elaboração deste repositório foi utilizada a versão 3.24.0 do SQLite.</p>
           </div>
         </div>
       </div>
@@ -164,8 +153,7 @@
 
 	
 
-    <!-- Código -->
-                
+    <!-- Código -->       
           <section id="codigo" class="four" style="padding-top: 10% ">
             <div class="container">
               <div class="row">
@@ -246,20 +234,13 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-8 mx-auto">
-            <h2>ALUNOS</h2>
-            <p>O SQLite implementa 3 modos de Threading:</p>
-            
-            <ul>
-              <li><p>Single thread: Modo onde todos mutex estão desabilitados e o SQLite não executa de forma segura em mais de uma thread de cada vez.</p>
-              </li>
-              <li><p>Multi-thread: Modo onde o SQLite pode ser utilizado com várias threads. Contudo uma conexão com o banco de dados não deve ser feita em mais que uma thread.</p>
-              </li>
-              <li><p>Serialized: SQLite pode utilizar várias threads sem restrição. Esse modo é utilizado como default.</p>
-              </li>
-            </ul>
-      
-            <p>O modo de implementação de thread pode ser selecionado no momento da compilação (compile-time), quando o aplicativo que utiliza o SQLite inicializa (start-time) ou quando a uma nova conexão com o SQLite está sendo criada (run-time).</p>
-            <p>Nessa linha de pensamento o run-time pode sobrescrever o start-time que por sua vez pode sobrescrever o compile-time. Quando compilado com a opção single thread as opções anteriores não podem ser sobrescritas.</p>
+            <h2>ALUNOS responsáveis por esse CTRL-C CTRL-V</h2>
+            <h4>Bruno Otávio Ramos</h4>
+            <p>Informação do meliante</p>
+            <h4>Wellington Lima</h4>
+            <p>Informação do meliante</p>
+            <h4>William Falinski</h4>
+            <p>Informação do meliante</p>
           </div>
         </div>
       </div>
@@ -270,7 +251,7 @@
     <!-- Footer -->
     <footer>
       <div class="container ">
-        <p>UEPG - Universidade Estadual de Ponta Grossa, 2018</p>
+        <p>UEPG - Universidade Estadual de Ponta Grossa, 2018 ---- METE um LOGO bem LOCO aqui</p>
       </div>
     </footer>
 
