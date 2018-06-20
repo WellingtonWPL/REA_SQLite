@@ -43,10 +43,16 @@
               <a class="nav-link js-scroll-trigger" href="#txt-intro">Introdução</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#txt-fir">Thread</a>
+              <a class="nav-link js-scroll-trigger" href="#txt-fir">Modos Thread</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#txt-sec">Modo Threading</a>
+              <a class="nav-link js-scroll-trigger" href="#txt-thr">Mutex</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#txt-for">Disputa</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#txt-fiv">Writer Starvation</a>
             </li>
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="#codigo">Código</a>
@@ -64,7 +70,7 @@
       <div class="intro-body">
         <div class="container">
           <div class="row">
-            <div class="col-lg-8 mx-auto">
+            <div class="col-lg-10 mx-auto">
               <h1 class="brand-heading">REA - SQLite</h1>
               <p class="intro-text">Repositório Educacional Aberto sobre a implementação 
               						de processos e threads no SQLite</p>
@@ -77,11 +83,11 @@
       </div>
     </header>
 
-    <!-- gray Section -->
-    <section id="txt-intro" class="gray-section content-section ">
+    <!--  Section -->
+    <section id="txt-intro" class="white-section">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 mx-auto">
+          <div class="col-lg-10 mx-auto">
             
             <img style="margin-bottom: 50px;" width="280px"  src="img/sqlite.svg" /> 
             <p >O SQLite é uma biblioteca em linguagem C de código aberto que implementa um sistema de banco de dados SQL imbutido. Ao contrário de outros bancos de dados que ficam em servidores, cada banco de dados SQLite é armazenado em um único arquivo no disco. A biblioteca lê e escreve diretamente no arquivo de banco de dados no disco.</p>
@@ -92,12 +98,12 @@
       </div>
     </section>
   
-    <!-- white Section -->
-    <section id="txt-fir" class="content-section ">
+    <!-- Section -->
+    <section id="txt-fir" class="blue-section ">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 mx-auto">
-            <h2>Threading no SQLite</h2>
+          <div class="col-lg-10 mx-auto">
+            <h2>&lt/&gt Threading no SQLite</h2>
             <p>O SQLite implementa 3 modos de Threading:</p>
             
             <ul>
@@ -110,41 +116,202 @@
             </ul>
       
             <p>O modo de implementação de thread pode ser selecionado no momento da compilação (compile-time), quando o aplicativo que utiliza o SQLite inicializa (start-time) ou quando a uma nova conexão com o SQLite está sendo criada (run-time).</p>
+
             <p>Nessa linha de pensamento o run-time pode sobrescrever o start-time que por sua vez pode sobrescrever o compile-time. Quando compilado com a opção single thread as opções anteriores não podem ser sobrescritas.</p>
+
           </div>
         </div>
       </div>
     </section>
 	
-    <!-- Gray Section -->
-    <section id="txt-sec" class="gray-section content-section">
+    <!-- Section -->
+    <section id="txt-sec" class="white-section">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 mx-auto">
-            <h2>Selecionando o modo de threading (compile-time)</h2>
+          <div class="col-lg-10 mx-auto">
+            <h2>&lt/&gt Selecionando o modo de threading</h2> 
+            <h2>"compile-time"</h2>
+
             <p>É configurado no momento da compilação pelo parâmetro de compilação SQLITE_THREADSAFE da seguinte forma:</p>
+
             <ul>
-              <li><p>-DSQLITE_THREADSAFE=0    ---> Utilizado para setar o modo single-thread.</p></li>
-              <li><p>-DSQLITE_THREADSAFE=1    ---> Utilizado para setar o modo serialized.</p></li>
-              <li><p>-DSQLITE_THREADSAFE=2    ---> Utilizado para setar o modo multi-thread.</p></li>
+              <li><p>-DSQLITE_THREADSAFE=0  &nbsp  /*Utilizado para setar o modo single-thread.*/</p></li>
+              <li><p>-DSQLITE_THREADSAFE=1  &nbsp  /*Utilizado para setar o modo serialized.*/</p></li>
+              <li><p>-DSQLITE_THREADSAFE=2  &nbsp  /*Utilizado para setar o modo multi-thread.*/</p></li>
             </ul>
-            <p>O retorno da função sqlite_threadsafe() é determinado pela seleção do modo de threading no momento da compilação, se selecionado o modo single-thread o retorno é FALSE caso seja selecionado o modo multi-thread ou serialized o retorno é TRUE.
-            </p>
-            <p>Caso o modo de thread for selecionado na compilação como single thread, toda a lógica responsável pela exclusão mútua (mutex) é omitido do programa final tornando impossível a seleção posterior sendo via start-time ou run-time de outro modo de threading.   
-            </p>
+
+            <p>O retorno da função sqlite_threadsafe() é determinado pela seleção do modo de threading no momento da compilação, se selecionado o modo single-thread o retorno é FALSE caso seja selecionado o modo multi-thread ou serialized o retorno é TRUE.</p>
+
+            <p>Caso o modo de thread for selecionado na compilação como single thread, toda a lógica responsável pela exclusão mútua (mutex) é omitido do programa final tornando impossível a seleção posterior sendo via start-time ou run-time de outro modo de threading. </p>
             
-            <h2>Selecionando o modo de threading (start-time)</h2>
+            <h2>"start-time"</h2>
+
             <p>Assumindo que o modo não foi selecionado na hora da compilação como single-thread o modo de thread pode ser alterado durante a inicialização utilizando a função sqlite3_config() passando como parâmetro SQLITE_CONFIG_SINGLETHREAD, QLITE_CONFIG_MULTITHREAD ou SQLITE_CONFIG_SERIALIZED.</p>
 
-            <h2>Selecionando o modo de threading (run-time)</h2>
+            <h2>"run-time"</h2>
+
             <p>Assumindo agora que no compile-time e start-time o modo de threading não foi setado como single-thread então as conexões individuais do banco de dados pode ser escolhida entre multi-thread e serialized. Neste momento não é possível passar uma conexão de single-thread para multi-thread ou serialized.</p>
+
             <p>O  modo de threading para a conexão individual do banco de dados é determinado pelas flags passadas no terceiro argumento da função sqlite3_open_v2(), que podem ser passadas das formas:</p>
+
             <ul>
-              <li><p>SQLITE_OPEN_NOMUTEX ---> A conexão é setada para modo multi-thread.</p></li>
-              <li><p>SQLITE_OPEN_FULLMUTEX  ---> A conexão é setada para modo serialized.</p></li>
+              <li><p>SQLITE_OPEN_NOMUTEX &nbsp /*A conexão é setada para modo multi-thread.*/</p></li>
+              <li><p>SQLITE_OPEN_FULLMUTEX  &nbsp /*A conexão é setada para modo serialized.*/</p></li>
             </ul>
+
             <p>Se a flag não for especificada ou for utilizada as funções sqlite3_open() ou sqlite3_open16(), o modo de threading é definido pelo compile-time e start-time.</p>
 
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section -->
+    <section id="txt-thr" class="blue-section ">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 mx-auto">
+            <h2>&lt/&gt Funções Mutex</h2>
+            <p>Para sincronização de threads o SQLite utiliza as seguintes rotinas:</p>
+            
+            <ul>
+              <li><p>sqlite3_mutex *sqlite3_mutex_alloc(int);</p>
+              </li>
+              <li><p>void sqlite3_mutex_free(sqlite3_mutex*);</p>
+              </li>
+              <li><p>void sqlite3_mutex_enter(sqlite3_mutex*);</p>
+              </li>
+              <li><p>int sqlite3_mutex_try(sqlite3_mutex*);</p>
+              </li>
+              <li><p>void sqlite3_mutex_leave(sqlite3_mutex*);</p>
+              </li>
+            </ul>
+      
+            <p>O SQLite possui múltiplas implementação dessas rotinas citadas, que são selecionadas no momento da compilação do código fonte, sendo elas:</p>
+
+            <ul>
+              <li><p>SQLITE_MUTEX_PTHREADS &nbsp/*Utilizado em sistemas do tipo UNIX*/</p>
+              </li>
+              <li><p>SQLITE_MUTEX_W32      &nbsp/*Utilizado em sistemas do tipo Windows*/</p>
+              </li>
+              <li><p>SQLITE_MUTEX_NOOP     &nbsp/*Para utilização em single-thread*/</p>
+              </li>
+            </ul>
+
+            <p>Nessa linha de pensamento o run-time pode sobrescrever o start-time que por sua vez pode sobrescrever o compile-time. Quando compilado com a opção single thread as opções anteriores não podem ser sobrescritas.</p>
+
+            <h5>&lt/&gt Rotina sqlite3_mutex_alloc()</h5>
+            <p>Aloca em memória um novo mutex e retorna o ponteiro para sua posição, caso retorne NULL o mutex não pode ser alocado. Os argumentos são apresentados a seguir como constantes inteiras definidas no código fonte sendo elas:
+            </p>
+            <ul>
+              <li><p>SQLITE_MUTEX_FAST </p>
+              </li>
+              <li><p>SQLITE_MUTEX_RECURSIVE </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_MASTER </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_MEM </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_OPEN </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_PRNG </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_LRU </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_PMEM </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_APP1 </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_APP2 </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_APP3 </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_VFS1 </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_VFS2 </p>
+              </li>
+              <li><p>SQLITE_MUTEX_STATIC_VFS3 </p>
+              </li>
+            </ul>
+            <p>SQLITE_MUTEX_FAST e SQLITE_MUTEX_RECURSIVE quando passadas por parâmetro criam um novo mutex podendo ser do tipo FAST ou RECURSIVE. O SQLite apenas utiliza o modo RECURSIVE caso seja realmente necessário caso contrário ele preferivelmente utiliza o mutex do tipo FAST.</p>
+
+            <p>Os outro argumentos quando passados para o sqlite3_mutex_alloc() retornam um ponteiro para um mutex do tipo STATIC pré-existente. Um mutex estático pode ser manipulado apenas internamente pelo SQLite, para as aplicações que utilizam o SQLite apenas os mutex dinâmicos, retornados utilizando SQLITE_MUTEX_FAST e SQLITE_MUTEX_RECURSIVE, devem ser utilizados.</p>
+
+            <h5>&lt/&gt Procedimento sqlite3_mutex_free()</h5>
+            <p>Desaloca um mutex alocado dinamicamente, caso houver uma tentativa de desalocar um mutex estático pode resultar em um comportamento indefinido.</p>
+
+            <h5>&lt/&gt Rotinas sqlite3_mutex_enter() e sqlite3_mutex_try()</h5>
+            <p>Procedimentos que tentam acessar um mutex. Caso outra thread já esteja dentro do mutex o procedimento sqlite3_mutex_enter() irá bloquear e a função sqlite3_mutex_try() irá retornar SQLITE_BUSY. O sqlite3_mutex_try() retorna SQLITE_OK caso a entrada seja permitida.</p>
+
+            <p>Para o caso de mutex recursivo, SQLITE_MUTEX_RECURSIVE, uma única thread pode tentar acessar o mutex várias vezes, o mutex deve ser fechado esse mesmo número de vezes para que outra thread possa acessá-lo.</p>
+
+            <h5>&lt/&gt Procedimento sqlite3_mutex_leave()</h5>
+            <p>Procedimento faz com que a thread saia do mutex que foi previamente inserida.</p>
+          
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--  Section -->
+    <section id="txt-for" class="white-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 mx-auto">
+            <h2>&lt/&gt Condição de Disputa</h2>
+
+            <p>Quando duas ou mais threads acessam a mesma base de dados em no modo memória compartilhada, chaves de escrita e leitura, tanto compartilhadas quanto exclusivas são usadas em tabelas individuais para garantir que execuções concorrentes se mantenham isoladas. Antes de uma operação de leitura, deve ser obtido uma chave de leitura compartilhada. Uma conexão libera todas as chaves que foram obtidas para uma tabela quando ela conclui suas operações. Se uma conexão não consegue obter uma chave, então uma chamada para sqlite3_step() retornará SQLITE_LOCKED.</p>
+
+            <p>Para chamadas de sqlite3_step() e sqlite3_prepare_v2() a uma referida chave não recebam SQLITE_LOCKED instantaneamente, mas sim bloqueiem até a referida chave estar disponível o SQLite utiliza sqlite3_unlock_notify().</p>
+
+            <p>Após uma chamada para sqlite3_step() ou sqlite3_prepare_v2() retornar SQLITE_LOCKED, sqlite3_unlock_notify() pode ser chamada para que quando a chave desejada esteja disponível, a conexão que a pediu receba uma notificação.  Essa notificação ocorrerá quando a conexão que está fazendo uso das chaves que bloqueiam sqlite3_step() or sqlite3_prepare_v2() de obterem a chave, terminar suas requisições e liberar as chaves.</p>
+            
+            <p>Quando uma notificação de disponibilidade de chave é emitida, esta é emitida de dentro de uma chamada para sqlite3_step()  associada com a conexão que está bloqueando esta chave.</p>
+            
+            <p>O algoritmo usado por sqlite3_blocking_step() funciona da seguinte forma:</p>
+
+            <ol>
+              <li><p>Chame sqlite3_step() no manipulador de intruções fornecido. Se esta chamada retornar qualquer coisa diferente de SQLITE_LOCKED então retorne este valor ao chamador, caso contrário continue.</p>
+              </li>
+
+              <li><p>Chame sqlite3_unlock_notify () no identificador de conexão do banco de dados associado ao manipulador de instrução fornecido para registrar um retorno de chamada de notificação de desbloqueio. Se a chamada para unlock_notify () retornar SQLITE_LOCKED, retorne esse valor para o chamador.</p>
+              </li>
+
+              <li><p>Bloqueie até que o retorno de chamada unlock-notify seja invocado por outra thread.</p>
+              </li>
+
+              <li><p>Chame sqlite3_reset () no manipulador de instrução. Como um erro SQLITE_LOCKED só pode ocorrer na primeira chamada para sqlite3_step () (não é possível que uma chamada para sqlite3_step () retorne SQLITE_ROW e, em seguida, a próxima SQLITE_LOCKED), o manipulador de instrução pode ser reconfigurado neste momento sem afetar os resultados da consulta do ponto de vista do chamador. Se sqlite3_reset () não fosse chamado neste ponto, a próxima chamada para sqlite3_step () retornaria SQLITE_MISUSE.</p>
+              </li>
+
+              <li><p>Retorne ao passo 1.</p>
+              </li>
+            </ol>
+      
+            <p>O algoritmo usado pela função sqlite3_blocking_prepare_v2 () é semelhante, exceto que a etapa 4 (reconfigurando o manipulador de instruções) é omitida.</p>
+          
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--  Section -->
+    <section id="txt-fiv" class="blue-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 mx-auto">
+          
+            <h2>&lt/&gt WRITER STARVATION</h2>
+            <p>Várias threads podem estar com uma chave de leitura simultâneamente. Se muitas threads estão com chaves de leitura sobrepostas, pode ocorrer que uma thread fique com uma chave de leitura para sempre, então uma tabela esperando para uma chave de escrita, esperará para sempre, este acontecimento é chamado de “writer starvation”.</p>
+            
+            <p>Para prevenir tais acontecimentos todas as tentativas de obter novas chaves falham caso até que uma das condições ocorram:</p>
+
+            <ul>
+              <li><p>A thread que está escrevendo termina sua operação.</p></li>
+              <li><p>O número de operações de leitura em shared-cache  e zero.</p></li>
+            </ul>
+
+            <p>Falhas na tentativa de abrir requisições de leitura retornam SQLITE_LOCKED para o chamador. Se este então chama sqlite3_unlock_notify() para requisitar uma notificação de desbloqueio de chave, a thread que está bloqueando é a thread que possui uma chave de escrita na cache-compartilhada.</p>
 
           </div>
         </div>
@@ -154,10 +321,10 @@
 	
 
     <!-- Código -->       
-          <section id="codigo" class="four" style="padding-top: 10% ">
+          <section id="codigo" class="white-section" style="padding-top: 10% ">
             <div class="container">
               <div class="row">
-                <div class="col-lg-8 mx-auto">
+                <div class="col-lg-10 mx-auto">
 
                   <header>
                     <h2>Código</h2>
@@ -230,17 +397,16 @@
           </section>
 
 
-  <section id="contact" class="gray-section content-section ">
+  <section id="contact" class="contact-section">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 mx-auto">
-            <h2>ALUNOS responsáveis por esse CTRL-C CTRL-V</h2>
-            <h4>Bruno Otávio Ramos</h4>
-            <p>Informação do meliante</p>
-            <h4>Wellington Lima</h4>
-            <p>Informação do meliante</p>
-            <h4>William Falinski</h4>
-            <p>Informação do meliante</p>
+          <div class="col-lg-10 mx-auto">
+            <h5>Bruno Otávio Ramos</h5>
+            <p>Informação </p>
+            <h5>Wellington Lima</h5>
+            <p>Informação </p>
+            <h5>William Falinski</h5>
+            <p>Informação </p>
           </div>
         </div>
       </div>
@@ -251,7 +417,8 @@
     <!-- Footer -->
     <footer>
       <div class="container">
-        <p>UEPG - Universidade Estadual de Ponta Grossa, 2018</p>
+        <p>&copy Bruno, Wellington e William, 2018 | Template by <a href="https://blackrockdigital.github.io/startbootstrap-grayscale/">GrayScale</a></p>
+        <p>UEPG - Universidade Estadual de Ponta Grossa</p>
         
       </div>
     </footer>
