@@ -201,6 +201,16 @@
 
             <p>Nessa linha de pensamento o run-time pode sobrescrever o start-time que por sua vez pode sobrescrever o compile-time. Quando compilado com a opção single thread as opções anteriores não podem ser sobrescritas.</p>
 
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="txt-thr" class="white-section ">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 mx-auto">
+
             <h5>&lt/&gt Rotina sqlite3_mutex_alloc()</h5>
             <p>Aloca em memória um novo mutex e retorna o ponteiro para sua posição, caso retorne NULL o mutex não pode ser alocado. Os argumentos são apresentados a seguir como constantes inteiras definidas no código fonte sendo elas:
             </p>
@@ -237,25 +247,105 @@
             <p>SQLITE_MUTEX_FAST e SQLITE_MUTEX_RECURSIVE quando passadas por parâmetro criam um novo mutex podendo ser do tipo FAST ou RECURSIVE. O SQLite apenas utiliza o modo RECURSIVE caso seja realmente necessário caso contrário ele preferivelmente utiliza o mutex do tipo FAST.</p>
 
             <p>Os outro argumentos quando passados para o sqlite3_mutex_alloc() retornam um ponteiro para um mutex do tipo STATIC pré-existente. Um mutex estático pode ser manipulado apenas internamente pelo SQLite, para as aplicações que utilizam o SQLite apenas os mutex dinâmicos, retornados utilizando SQLITE_MUTEX_FAST e SQLITE_MUTEX_RECURSIVE, devem ser utilizados.</p>
+    
+
+            <!-- Código -->                            
+            <p align="justify">Código sqlite3_mutex *sqlite3_mutex_alloc()</p>
+            <code>     
+              <pre class="prettyprint">
+
+SQLITE_API sqlite3_mutex *sqlite3_mutex_alloc(int id){
+    ifndef SQLITE_OMIT_AUTOINIT
+    if( id<=SQLITE_MUTEX_RECURSIVE && sqlite3_initialize() ) return 0;
+    if( id>SQLITE_MUTEX_RECURSIVE && sqlite3MutexInit() ) return 0;
+    #endif
+    assert( sqlite3GlobalConfig.mutex.xMutexAlloc );
+    return sqlite3GlobalConfig.mutex.xMutexAlloc(id);
+}           
+            </pre>
+          </code> 
+   
+
 
             <h5>&lt/&gt Procedimento sqlite3_mutex_free()</h5>
             <p>Desaloca um mutex alocado dinamicamente, caso houver uma tentativa de desalocar um mutex estático pode resultar em um comportamento indefinido.</p>
+          
+
+
+
+                                
+            <p align="justify">Código sqlite3_mutex_free()</p>
+            <code>     
+              <pre class="prettyprint">
+
+SQLITE_API void sqlite3_mutex_free(sqlite3_mutex *p){
+  if( p ){
+    assert( sqlite3GlobalConfig.mutex.xMutexFree );
+    sqlite3GlobalConfig.mutex.xMutexFree(p);
+  }
+} 
+              </pre>
+          </code> 
+          
 
             <h5>&lt/&gt Rotinas sqlite3_mutex_enter() e sqlite3_mutex_try()</h5>
             <p>Procedimentos que tentam acessar um mutex. Caso outra thread já esteja dentro do mutex o procedimento sqlite3_mutex_enter() irá bloquear e a função sqlite3_mutex_try() irá retornar SQLITE_BUSY. O sqlite3_mutex_try() retorna SQLITE_OK caso a entrada seja permitida.</p>
 
             <p>Para o caso de mutex recursivo, SQLITE_MUTEX_RECURSIVE, uma única thread pode tentar acessar o mutex várias vezes, o mutex deve ser fechado esse mesmo número de vezes para que outra thread possa acessá-lo.</p>
+          
+                                
+            <p align="justify">Código sqlite3_mutex_enter()</p>
+            <code>     
+              <pre class="prettyprint">
+
+SQLITE_API void sqlite3_mutex_enter(sqlite3_mutex *p){
+  if( p ){
+    assert( sqlite3GlobalConfig.mutex.xMutexEnter );
+    sqlite3GlobalConfig.mutex.xMutexEnter(p);
+  }
+}
+              </pre>
+          </code> 
+          <p align="justify">Código sqlite3_mutex_try()</p>
+
+          <code>     
+              <pre class="prettyprint">
+
+SQLITE_API int sqlite3_mutex_try(sqlite3_mutex *p){
+  int rc = SQLITE_OK;
+  if( p ){
+    assert( sqlite3GlobalConfig.mutex.xMutexTry );
+    return sqlite3GlobalConfig.mutex.xMutexTry(p);
+  }
+  return rc;
+}
+              </pre>
+          </code> 
 
             <h5>&lt/&gt Procedimento sqlite3_mutex_leave()</h5>
             <p>Procedimento faz com que a thread saia do mutex que foi previamente inserida.</p>
-          
+                                
+            <p align="justify">Código sqlite3_mutex_leave()</p>
+            <code>     
+              <pre class="prettyprint">
+
+SQLITE_API void sqlite3_mutex_leave(sqlite3_mutex *p){
+  if( p ){
+    assert( sqlite3GlobalConfig.mutex.xMutexLeave );
+    sqlite3GlobalConfig.mutex.xMutexLeave(p);
+  }
+} 
+              </pre>
+          </code> 
           </div>
         </div>
       </div>
     </section>
 
+
+
     <!--  Section -->
-    <section id="txt-for" class="white-section">
+    <section id="txt-for" class="blue-section">
       <div class="container">
         <div class="row">
           <div class="col-lg-10 mx-auto">
@@ -296,7 +386,7 @@
     </section>
 
     <!--  Section -->
-    <section id="txt-fiv" class="blue-section">
+    <section id="txt-fiv" class="white-section">
       <div class="container">
         <div class="row">
           <div class="col-lg-10 mx-auto">
@@ -318,95 +408,61 @@
       </div>
     </section>
 
-	
 
-    <!-- Código -->       
-          <section id="codigo" class="white-section" style="padding-top: 10% ">
-            <div class="container">
-              <div class="row">
-                <div class="col-lg-10 mx-auto">
+     <!--  Section -->
+    <section id="txt-fiv" class="blue-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 mx-auto"> 
+            <h2>&lt/&gt Cache compartilhado</h2>
+            <p> O “cache compartilhado” é destinado a servidores dedicados, quando o modo de cache compartilhado está  ativo e uma thread estabelecer várias conexões para o mesmo banco de dados, as conexões compartilharão um único cache de esquema e de dados do banco. Isso pode reduzir significativamente a quantidade de memória e E/S exigidas pelo sistema. Na versão consequente o sqlite modificou o método de cache compartilhado, fazendo com que o mesmo cache possa ser compartilhado em todo um processo invés de apenas um único thread.
+            </p>
 
-                  <header>
-                    <h2>Código</h2>
-                  </header>
-                                    
-                                <p align="justify">O código em linguagem C abaixo ....</p>
-                  
-  <pre class="prettyprint"><![CDATA[
-  //O código foi escrito baseando-se no exemplo mostrado no vídeo para uma compreensão facilitada
-  //Pessoas pagando contas em um caixa que só permite certo numero de contas
-  #include <stdlib.h> 
-  #include <stdio.h>  
-  #define tam 30 //número máximo de pessoas
+            <p> Do ponto de vista externa de outro processo ou thread, duas ou mais conexões ao banco de dados, por meio de cache compartilhada, aparecem como uma única conexão. O protocolo de bloqueio normal é usado para serializar o acesso ao banco de dados entre uma conexão e uma cache compartilhado, por exemplo.Existem três níveis para o modelo de bloqueio de cache compartilhado, bloqueio de nível de transação, bloqueio de nível de tabela e bloqueio de nível de esquema. Eles são descritos nas três subseções seguintes.
+            </p>
 
-  int pessoas[tam];           //Fila de pessoas
-  int NumEscolhidoPessoas;
-  int quantum;                //Numero de contas pra pagar no caixa
+            <h5>BLOQUEIO NO NÍVEL DE TRANSAÇÃO</h5>
+            <p>Conexões SQLite podem abrir dois tipos de transações, ler e gravar. Isso não é feito explicitamente, uma transação de maneira implícita é uma transação de leitura até que a primeira grava em uma tabela de banco de dados, de forma em que se torna uma transação de gravação. No máximo, uma conexão com um único cache compartilhado pode abrir uma transação de gravação a qualquer momento. Isso pode coexistir com qualquer número de transações de leitura.
+            </p>
 
-  void contas(){       //Para que o usuario possa testar com diferentes quantidades de contas
-    int numero;
-    int i;
-    for (i=1; i<=NumEscolhidoPessoas; i++){
-      printf("\nDigite o numero de contas a pagar da pessoa %d:", i);
-      scanf("%d", &numero);               //Leitura de valor inserido pelo usuario
-      pessoas[i]= numero;                 //cada pessoa recebe o valor informado
-    }
-  }
+            <h5>BLOQUEIO NO NÍVEL DE TABELA</h5>
+            <p>Quando duas ou mais conexões usam um cache compartilhado, os bloqueios são usados ​​para serializar as tentativas de acesso simultâneo por tabela. As tabelas suportam dois tipos de bloqueios, "bloqueios de leitura" e "bloqueios de gravação". Os bloqueios são concedidos as conexões - a qualquer momento, cada conexão de banco de dados possui um bloqueio de leitura, um bloqueio de gravação ou nenhum bloqueio, isso dado em cada tabela do banco de dados.
+            </p>
 
-  void fila(){
-    int contadorFila=NumEscolhidoPessoas;            //contagem de pessoas que estão na fila
-    int frenteFila = 1;                 //Primeira posição da fila
-    while(contadorFila !=0){
-      while(pessoas[frenteFila] <= 0){ //Tira pessoas que não tem contas da primeira posição
-        frenteFila++;
-        if(frenteFila>= NumEscolhidoPessoas) //Faz a rotação
-          frenteFila=0;
-      }
-      printf("\n\nA pessoa %d vai para o caixa com %d contas", frenteFila , pessoas[frenteFila]);
-      printf("\nPaga ate %d contas", quantum);
-      pessoas[frenteFila] = pessoas[frenteFila] - quantum;        //Pagamento de quantum contas
-      if( pessoas[frenteFila]<=0){
-        printf("\nE sai da fila.\n");
-        contadorFila--;
-      }
-      else{
-        printf("\nE vai pro final da fila com %d contas restantes.\n", pessoas[frenteFila]);
-      }
-      frenteFila++;                               //Atualiza primeira posição
-        if(frenteFila>NumEscolhidoPessoas)    //Faz a rotação
-          frenteFila=0;
-      system("PAUSE");
-    }
-  }
+            <p>A qualquer momento, uma única tabela pode ter qualquer número de bloqueios de leitura ativos ou um único bloqueio de gravação ativo. Para ler dados em uma tabela, uma conexão deve primeiro obter um bloqueio de leitura. Para gravar em uma tabela, uma conexão deve obter um bloqueio de gravação nessa tabela. Se um bloqueio de tabela necessário não puder ser obtido, a consulta falhará e SQLITE_LOCKED será retornado ao responsável pela chamada.
+            </p>
 
-  main(){
-                    printf("::::::: Programa exemplo sobre round-robin :::::::");
-                    printf("\nDigite o numero maximo de contas a pagar no caixa (quantum): ");
-                    scanf("%d", &quantum);
-                    printf("\nDigite o numero de pessoas na fila: ");
-                    scanf("%d", &NumEscolhidoPessoas);
-                    contas();
-                    fila();
-                    printf("\n\n::::::::: Fim ::::::::::\n");
-                    getch();
-  } 
-  ]]></pre>
-                </div>
-              </div>
-            </div>
-          </section>
+            <p>Quando uma conexão obtém um bloqueio de tabela, ela não é liberada até que a transação atual (leitura ou gravação) seja concluída.
+            </p>
+
+            <h5>BLOQUEIO NO NÍVEL DE ESQUEMA</h5>
+            <p>A tabela sqlite_master suporta os bloqueios de leitura e gravação do cache compartilhado da mesma maneira que todas as outras tabelas do banco de dados. As seguintes regras especiais também se aplicam:
+            </p>
+            <ul>
+              <li><p>Uma conexão deve obter um bloqueio de leitura no sqlite_master antes de acessar qualquer tabela de banco de dados ou obter qualquer outro bloqueio de leitura ou gravação.</p>
+              </li>
+              <li><p>Antes de executar uma instrução que modifica o esquema do banco de dados (ou seja, uma instrução CREATE ou DROP TABLE), uma conexão deve obter um bloqueio de gravação em sqlite_master.</p>
+              </li>
+              <li><p>Uma conexão pode não compilar uma instrução SQL se qualquer outra conexão estiver mantendo um bloqueio de gravação na tabela sqlite_master de qualquer banco de dados anexado (incluindo o banco de dados padrão, "main").</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
 
 
-  <section id="contact" class="contact-section">
+
+  <section id="contact" class="white-section">
       <div class="container">
         <div class="row">
           <div class="col-lg-10 mx-auto">
             <h5>Bruno Otávio Ramos</h5>
-            <p>Informação </p>
+            <p>Acadêmico de Engenharia de Computação UEPG</p>
             <h5>Wellington Lima</h5>
-            <p>Informação </p>
+            <p>Acadêmico de Engenharia de Computação UEPG</p>
             <h5>William Falinski</h5>
-            <p>Informação </p>
+            <p>Acadêmico de Engenharia de Computação UEPG</p>
           </div>
         </div>
       </div>

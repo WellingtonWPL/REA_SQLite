@@ -159,14 +159,14 @@ a:focus, a:hover {
     background:rgba(255, 255, 255, .1)
 }
 .white-section {
-    padding-top:150px;
-    padding-bottom:150px;
+    padding-top:30px;
+    padding-bottom:30px;
     background-color: #ffffff;
     color: black
 }
 .blue-section {
-    padding-top:150px;
-    padding-bottom:150px;
+    padding-top:30px;
+    padding-bottom:30px;
     color:#fff;
     background-color:#4976d0;
 }
@@ -230,6 +230,8 @@ ul.banner-social-buttons {
     }
 }
 footer {
+    color: white;
+    background-color: black;
     padding:50px 0
 }
 footer p {
